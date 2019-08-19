@@ -11,10 +11,10 @@ const txt = folders
     .map(item => handleFolder('.', item))
     .filter(item => item != null)
     .reduce((total, current) => {
-        let content = '#### ' + '[' + current.title + ']' + '(' + './' + current.title + ')' + '\n'
+        let content = '### ' + '[' + current.title + ']' + '(' + './' + current.title + ')' + '\n'
         return total
             + current.files.reduce((tot, cur) => {
-                return tot + '* ' + '[' + cur.names.cn + ']' + '(' + cur.path + ')' + '\n'
+                return tot + '* ' + '[' + cur.names.cn + '(' + cur.names.en + ')' + ']' + '(' + cur.path + ')' + '\n'
             }, content)
     }, README_TITLE)
 
