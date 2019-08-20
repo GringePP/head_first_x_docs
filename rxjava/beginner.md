@@ -54,7 +54,7 @@ public abstract class Observable<T> implements ObservableSource<T> {
 
 ### Observer
 
-观察者，通过 Observable 的 subscribe 方法将其与 Observable 关联起来。
+观察者，通过 Observable 的 `subscribe` 方法将其与 Observable 关联起来。
 
 同样看下 Observer 中跟本章关系较紧密的几个方法：
 
@@ -91,9 +91,9 @@ Observable.create(new ObservableOnSubscribe<String>() {
 });
 ```
 
-create 方法需要传入一个 ObservableOnSubcribe 对象，其便是事件流中的 **源（source）**。
+`create` 方法需要传入一个 ObservableOnSubcribe 对象，其便是事件流中的 **源（source）**。
 
-ObservableOnSubscribe 其实是一个接口（所以上面其实是一个匿名实现类），subscribe 是需要实现的方法，由于它是整个事件流的源头，故所有事件都会从 subscribe 方法中产生。
+ObservableOnSubscribe 其实是一个接口（所以上面其实是一个匿名实现类），`subscribe` 是需要实现的方法，由于它是整个事件流的源头，故所有事件都会从 subscribe 方法中产生。
 
 ```java
 public interface ObservableOnSubscribe<T> {
@@ -101,7 +101,7 @@ public interface ObservableOnSubscribe<T> {
 }
 ```
 
-这里我们先不管 subscribe 方法中具体要干什么，先看看 create 方法内部的实现：
+这里我们先不管 `subscribe` 方法中具体要干什么，先看看 `create` 方法内部的实现：
 
 ```java
 public static <T> Observable<T> create(ObservableOnSubscribe<T> source) {
@@ -125,7 +125,7 @@ public final class ObservableCreate<T> extends Observable<T> {
 
 ### 观察者
 
-上面提到，Observable 对象会通过 subscribe 方法绑定 Observer，如下：
+上面提到，Observable 对象会通过 `subscribe` 方法绑定 Observer，如下：
 
 ```java
 Observable.create(new ObservableOnSubscribe<String>() {
@@ -152,9 +152,7 @@ Observable.create(new ObservableOnSubscribe<String>() {
 
 ### 绑定
 
-
-
-那么，接下来就是需要分析，当具体事件发生时，Observer 的回调方法如何被调起的，即这些回调方法如何绑定到事件上。这部分逻辑正是隐藏在 Observable 的 subscribe 的方法中：
+那么，接下来就是需要分析，当具体事件发生时，Observer 的回调方法如何被调起的，即这些回调方法如何绑定到事件上。这部分逻辑正是隐藏在 Observable 的 `subscribe` 的方法中：
 
 ```java
 public final void subscribe(Observer<? super T> observer) {
@@ -180,7 +178,7 @@ public final void subscribe(Observer<? super T> observer) {
 }
 ```
 
-除了 RxJavaPlugins 和一些异常处理外，注意到一个 subscribeActual 方法，这是 Observable 的抽象方法：
+除了 RxJavaPlugins 和一些异常处理外，注意到一个 `subscribeActual` 方法，这是 Observable 的抽象方法：
 
 ```java
 protected abstract void subscribeActual(Observer<? super T> observer);
@@ -215,14 +213,14 @@ public final class ObservableCreate<T> extends Observable<T> {
 这个方法中主要做了3件事情：
 
 1. 创建 CreateEmitter 实例，并让其持有 Observer
-2. 调用 Observer 的 onSubscribe 方法，同时将 CreateEmitter 实例传入（体现为 Disposable）
-3. 调用 ObservableOnSubscribe 的 subscribe 方法，并将 CreateEmitter 实例传入
+2. 调用 Observer 的 `onSubscribe` 方法，同时将 CreateEmitter 实例传入（体现为 Disposable）
+3. 调用 ObservableOnSubscribe 的 `subscribe` 方法，并将 CreateEmitter 实例传入
 
 3个步骤中都出现了 CreateEmitter，这个东西很重要，因为正是它把整个 Observable 和 Observer 串起来。这三件事情做完，整个事件流已经可以衔接起来了。还没看懂事件流衔接的同学莫慌，下面发送事件说明中会解释。
 
 ### 发送事件
 
-这个时候我们再回过头看 ObservableOnSubscribe 的 subscribe 方法，由于它是整个事件的源头，意味着我们可以在这个方法中产生事件：
+这个时候我们再回过头看 ObservableOnSubscribe 的 `subscribe` 方法，由于它是整个事件的源头，意味着我们可以在这个方法中产生事件：
 
 ```java
 Observable.create(new ObservableOnSubscribe<String>() {
@@ -256,7 +254,7 @@ Observable.create(new ObservableOnSubscribe<String>() {
     });
 ```
 
-可以看到，我们可以通过 emitter 产生 onNext、onComplete 事件，按照常理，这些事件肯定最终会“流到” Observer 中并调用相应方法。
+可以看到，我们可以通过 emitter 产生 `onNext`、`onComplete` 事件，按照常理，这些事件肯定最终会“流到” Observer 中并调用相应方法。
 
 上面我们也说到了整个事件流已经衔接起来了，那么我们就看看它是怎么从源头流到 Observer 中的。
 
@@ -352,4 +350,48 @@ implements ObservableEmitter<T>, Disposable {
 }
 ```
 
-可见，CreateEmitter 的 onNext、onComplete 和 onError 方法都会调用 Observer 的相应方法（当然调用前会进行 Disposable 接口的相关判断，不属于本篇范畴，故不在此展开讨论）。
+可见，CreateEmitter 的 `onNext`、`onComplete` 和 `onError` 方法都会调用 Observer 的相应方法（当然调用前会进行 Disposable 接口的相关判断，不属于本篇范畴，故不在此展开讨论）。
+
+### 解绑
+
+在某些场景中，我们需要取消 Observable 和 Observer 之间的绑定关系，注意到我们之前 CreateEmitter 在调用 Observer 的 `onNext`、`onComplete` 等方法之前，都会进行一个 `isDisposed` 的判断，那么我们可以借助这个特性来做到 Observable 发出的事件，Observer 不会接收到：
+
+```java
+Observable
+    .create(new ObservableOnSubscribe<String>() {
+        @Override
+        public void subscribe(ObservableEmitter<String> emitter) throws Exception {
+            emitter.onNext("start");
+            emitter.onNext("end");
+            emitter.onNext("no longer can be received");
+        }
+    })
+    .subscribe(new Observer<String>() {
+        private Disposable d;
+
+        @Override
+        public void onSubscribe(Disposable d) {
+            this.d = d;
+        }
+
+        @Override
+        public void onNext(String s) {
+            if (s.equals("end")) {
+                d.dispose();
+            }
+        }
+
+        @Override
+        public void onError(Throwable e) {
+
+        }
+
+        @Override
+        public void onComplete() {
+
+        }
+    });
+```
+
+
+
