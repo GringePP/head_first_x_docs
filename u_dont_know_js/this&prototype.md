@@ -103,3 +103,85 @@ obj1.obj2.foo();		//Jet
 
 上面我们说到，this 具体被绑定到哪个对象上，除了考虑绑定规则外，还需要判断函数被调用的位置。在某些情况下，隐式绑定的规则会失效，我们称之为*隐式丢失*。
 
+```js
+function foo() {
+    console.log(this.name);
+}
+
+var name = "Jet";
+
+var obj = {
+    name: "Bob",
+    foo: foo
+}
+
+var bar = obj.foo;
+
+bar();		//Jet
+```
+
+虽然 bar 是 obj.foo 的引用，但是其本质引用的是 foo 函数，故调用下的上下文环境是全局。
+
+```js
+function foo() {
+    console.log(this.name);
+}
+
+var name = "Jet";
+
+var obj = {
+    name: "Bob",
+    foo: foo
+}
+
+setTimeout(obj.foo, 500);		//Jet
+```
+
+上面这种将函数作为回调函数传入的场景，也会导致隐式绑定丢失。
+
+### 显式绑定
+
+`call` 和 `apply` 函数可以“显式”地指定上下文对象，当时显式绑定仍然可能发生绑定丢失的问题。故我们一般有以下几种方式来避免绑定丢失。
+
+#### 硬绑定
+
+```js
+function foo() {
+    console.log(this.name);
+}
+
+var obj = {
+    name: "Jet"
+}
+
+function hardBind() {
+    foo.call(obj);
+}
+
+hardBind();		//Jet
+setTimeout(hardBind, 100);		//Jet
+```
+
+可以看到，无论我们以何种方式来调用 `hardBind`，其始终将 foo 函数运行在 obj 的上下文环境下，这是一种显式的强制绑定，故称之为*硬绑定*。
+
+上面的绑定方式看起来比较生硬，灵活性并不高，我们可以创建一个可重复使用的辅助函数：
+
+```js
+function foo() {
+    console.log(this.name);
+}
+
+function bind(fn, ctx) {
+    return function() {
+        return fn.apply(ctx, arguments);
+    }
+}
+
+var obj = {
+    name: "Jet"
+}
+
+var func = bind(foo, obj);
+func();		//Jet
+```
+
