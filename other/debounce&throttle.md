@@ -1,3 +1,8 @@
+---
+title_cn: 防抖和节流
+title_en: Debounce and throttle
+---
+
 # 防抖和节流
 
 ## 防抖

@@ -1,3 +1,8 @@
+---
+title_cn: 作用域&闭包
+title_en: scope and closure
+---
+
 # 作用域&闭包
 
 ## 作用域

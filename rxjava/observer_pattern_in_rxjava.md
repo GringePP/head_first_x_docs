@@ -1,3 +1,8 @@
+---
+title_cn: RxJava 中的观察者模式
+title_en: Observer pattern in RxJava
+---
+
 # RxJava 中的观察者模式
 
 RxJava 是个 JVM 上的异步增强扩展库。具体其背景和作用不在这里赘述，重点关注源码的实现和设计模式。

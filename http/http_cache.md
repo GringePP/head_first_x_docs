@@ -1,3 +1,8 @@
+---
+title_cn: 浏览器的缓存机制 http cache
+title_en: http cache in browser
+---
+
 # 浏览器的缓存机制 http cache
 
 ## 简介

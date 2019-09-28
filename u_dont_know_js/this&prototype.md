@@ -1,3 +1,8 @@
+---
+title_cn: this和原型
+title_en: this and prototype
+---
+
 # This&Prototype
 
 ## this
