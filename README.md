@@ -7,6 +7,7 @@
 ### [rxjava](./rxjava)
 * [RxJava 中的观察者模式(Observer pattern in RxJava)](./rxjava/observer_pattern_in_rxjava.md)
 * [RxJava 的线程框架 - subscribeOn(Thread framework in RxJava — subscribeOn)](./rxjava/thread_framework_in_rxjava.md)
+* [RxJava 的线程框架 - observeOn(Thread framework in RxJava — observeOn)](./rxjava/thread_framework_in_rxjava_observeOn.md)
 ### [u_dont_know_js](./u_dont_know_js)
 * [作用域&闭包(scope and closure)](./u_dont_know_js/scope&closure.md)
 * [this和原型(this and prototype)](./u_dont_know_js/this&prototype.md)
